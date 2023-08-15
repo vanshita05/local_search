@@ -1,0 +1,647 @@
+
+@media (min-width:1600px){
+    .slide-text {
+        padding: 50px 250px;
+    }
+}
+
+@media (min-width:1800px){
+    .slide-text {
+        padding: 65px 375px;
+    }
+}
+
+
+@media (max-width:1199px){
+    .container {width: 100%;}
+    #cssmenu > ul > li > a {
+        padding: 23px 10px;
+    }
+}
+
+@media (max-width:1040px){
+    .slide-text {
+        padding: 10px 60px;
+    }
+    .HeadlineSection h3 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .AboutSection .col-sm-6 {
+        position: relative;
+        float: left;
+        width: 100%;
+        text-align: center;
+        padding: 0 15px;
+    }
+    .AboutSection .col-sm-6.left .img-responsive {
+        display: inline-block;
+    }
+    .AboutSection .col-sm-6.left a {
+        position: absolute;
+        top: 33%;
+        left: 46%;
+    }
+    .inner-vm {
+        min-height: 280px;
+    }
+    .inner-vm p {
+        font-size: 17px;
+    }
+    footer .col-sm-3 li a {
+        font-size: 12px;
+    }
+}
+
+@media (max-width:980px){
+    .ServicesSection .col-sm-3 {
+        float: left;
+        width: 50%;
+        margin-bottom: 25px;
+    }
+    #cssmenu .button {
+        background-color: #ffffff;
+        cursor: pointer;
+        height: 44px;
+        position: absolute;
+        right: 10px;
+        top: 7px;
+        width: 50px;
+        z-index: 12399994;
+    }
+    #cssmenu .button::after {
+        border-bottom: 2px solid #000;
+        border-top: 2px solid #000;
+        content: "";
+        display: block;
+        height: 8px;
+        position: absolute;
+        right: 10px;
+        top: 22px;
+        width: 25px;
+    }
+    #cssmenu .button::before {
+        background: #000 none repeat scroll 0 0;
+        content: "";
+        display: block;
+        height: 2px;
+        position: absolute;
+        right: 10px;
+        top: 16px;
+        transition: all 0.3s ease 0s;
+        width: 25px;
+    }
+    #cssmenu .button.menu-opened::after {
+        background: #000 none repeat scroll 0 0;
+        border: 0 none;
+        height: 2px;
+        top: 22px;
+        transform: rotate(45deg);
+        transition: all 0.3s ease 0s;
+        width: 25px;
+    }
+    #cssmenu .button.menu-opened::before {
+        background: #000 none repeat scroll 0 0;
+        top: 22px;
+        transform: rotate(-45deg);
+        width: 25px;
+    }
+    #cssmenu #head-mobile {
+        padding: 29px;
+    }
+    .SearchFrom .btn.btn-default {
+        margin: 7px 50px 7px 0;
+    }
+    #cssmenu ul {
+        background-color: #fff;
+        width: 100%;
+    }
+
+    #cssmenu > ul > li > a {
+        padding: 16px 10px;
+    }
+    #cssmenu ul li,#cssmenu .submenu-button {
+        border-color: #e4e4e4;
+    }
+    #cssmenu .submenu-button::before,#cssmenu .submenu-button::after {
+        background: #000 none repeat scroll 0 0;
+    }
+    #cssmenu > ul > li > a {
+        color: #000;
+    }
+    .SucessStory .col-md-3 {
+        float: left;
+        width: 50%;
+    }
+    .CustomerCareSection {
+        float: left;
+        width: 100%;
+        padding: 10px 20px;
+    }
+    .SecSection .col-sm-6 {
+        float: left;
+        width: 100%;
+    }
+}
+
+@media (max-width:800px){
+    .pull-left.Logo img {
+        width: 80%;
+    }
+    .slide-text h1 {
+        font-size: 26px;
+        line-height: normal;
+        margin-bottom: 0;
+    }
+    .slide-text > p {
+        font-size: 15px;
+        line-height: 18px;
+    }
+    .slide-text > a.btn-default .fa, .Btns .fa {
+        font-size: 14px;
+        line-height: normal;
+        padding-right: 5px;
+    }
+    .slide-text > a.btn-default, .Btns {
+        font-size: 13px;
+        line-height: 5px;
+        padding: 10px 15px;
+    }
+    .HeadlineSection h3 {
+        line-height: 35px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    .AboutSection .col-sm-6.left a {
+        left: 44%;
+        position: absolute;
+        top: 35%;
+    }
+    .inner-vm p {
+        font-size: 15px;
+    }
+    .footer .col-sm-6 {
+        float: left;
+        width: 100%;
+    }
+    footer .col-sm-3 {
+        border-left: medium none;
+        float: left;
+        min-height: auto;
+        padding-top: 5px;
+        width: 50%;
+    }
+    .footer .col-sm-6.col-xs-12 {
+        float: left;
+        margin-bottom: 15px;
+        padding: 0;
+        width: 50%;
+    }
+    footer .col-sm-2 img {
+        padding-top: 2px;
+    }
+    footer .col-sm-6 .col-sm-2 {
+        width: auto;
+    }
+    .copyright .col-sm-8, .copyright .col-sm-4 {
+        float: left;
+        text-align: center;
+        width: 100%;
+    }
+    .pull-right.innerCount {
+        display: inline-block;
+        float: none !important;
+    } 
+    .col-sm-4.SubMember {
+        width: 50%;
+        float: left;
+    }
+    .col-sm-6.col-sm-offset-3.MainMember {
+        margin: 0;
+        width: 100%;
+        float: left;
+    }
+    .CustomerCareSection h1 {
+        font-size: 16px;
+        color: #fff;
+        float: left;
+        width: 100%;
+        font-weight: 600;
+    }
+    .col-sm-12 .innerCare h2 {
+        font-size: 13px;
+    }
+
+}
+
+@media (max-width:768px){
+    .sectop a {
+        font-size: 13px;
+        padding: 10px 15px;
+
+    }
+    .slide-text {
+        padding: 0 15px;
+    }
+    .visionMision .col-sm-6.text-center {
+        float: left;
+        width: 100%;
+    }
+    .inner-vm {
+        margin: 15px 0;
+        min-height: 220px;
+    }
+    .inner-vm:hover {
+        background: rgba(0, 0, 0, 0) url("../images/bg-5.jpg") no-repeat scroll center center / cover ;
+    }
+}
+
+
+@media (max-width:767px){
+    .AboutSection .col-sm-6 .col-sm-4 {
+        float: left;
+        width: 33%;
+    }
+    .HeadlineSection2 {
+        text-align: center;
+    }
+    .HeadlineSection2 .Btns {
+        margin-top: 15px;
+    }
+    .footer .col-sm-6 {
+        float: left;
+        text-align: center;
+        width: 100%;
+    }
+    footer .col-sm-3 li a {
+        text-align: left;
+    }
+    .InnerLDeatails {
+        background-size: cover;
+        margin-bottom: 60px;
+    }
+    .inner-vm.vm-1:hover {
+        background-size: cover;
+    }
+    .col-sm-12.left.SmallSlider {
+        width: 100%;
+    }
+    .AboutSection .right.carousel-control {
+        right: 42.6%;
+    }
+    .AboutSection .left.carousel-control {
+        left: 42.6%;
+    }
+    .AboutSection .col-sm-12 p {
+        font-size: 16px;
+        text-align: justify;
+    }
+    .innerAbout .col-sm-4 .img-responsive {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    .AboutinnerSection h1 {
+        float: left;
+        width: 100%;
+    }
+    .pmmydetails h2.subhead {
+        float: left;
+        width: 100%;
+    }
+    .demo-gallery > ul > li a {
+        float: left;
+        width: 100%;
+    }
+    .col-sm-12 .innerCare h2 {
+        font-size: 13px;
+        float: left;
+    }
+    .col-sm-12.SecSection {
+        float: left;
+        width: 100%;
+    }
+    .table-responsive.col-sm-12.CustmTable {
+        margin-top: 15px;
+        float: left;
+        width: 100%;
+        padding: 0;
+    }
+}
+
+@media (max-width:667px){
+    header::after,header::before {
+        border: medium none;
+        content: "";
+        height: 0;
+        position: relative;
+        top: 0;
+        width: 0;
+        z-index: -1;
+    }
+    .pull-left.Logo img {
+        margin-bottom: 10px;
+        width: auto;
+    }
+    .pull-left.Logo {
+        float: left;
+        text-align: center;
+        width: 100%;
+    }
+    .pull-right.RightSection {
+        text-align: center;
+        width: 100%;
+    }
+    .RightSection .top, .RightSection .sectop {
+        display: inline-block;
+        float: none;
+    }
+    .slide-text > p {
+        font-size: 14px;
+        line-height: 18px;
+    }
+    .indicators-line > .carousel-indicators {
+        margin: 0 0 10px;
+        right: 10px;
+        width: auto;
+    }
+    .HeadlineSection h3 {
+        float: left;
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 35px;
+        text-align: center;
+        width: 100%;
+    }
+    .HeadlineSection {
+        text-align: center;
+    }
+    .HeadlineSection a {
+        display: inline-block;
+        float: none;
+        margin: 5px 0 0;
+    }
+
+    .HeadlineSection {
+        padding: 20px 0;
+    }
+}
+
+@media (max-width:640px){
+    .slide-text > p {
+        display: none;
+    }
+    .slide-text h1 {
+        float: left;
+        font-size: 26px;
+        line-height: normal;
+        margin-bottom: 10px;
+        margin-top: 40px;
+        width: 100%;
+    }
+    .HeadlineSection h3 {
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 26px;
+    }
+    .AboutSection .col-sm-4 img {
+        display: inline-block;
+        float: none;
+    }
+    .AboutSection .col-sm-6 .col-sm-4 p br {
+        display: none;
+    }
+    .AboutSection .col-sm-6 .col-sm-4 {
+        float: left;
+        width: 33%;
+    }
+    .AboutSection .col-sm-6 .col-sm-4 p {
+        color: #000;
+        float: left;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 19px;
+        text-transform: uppercase;
+        float: left;
+        text-align: center;
+        width: 100%;
+    }
+    footer .col-sm-10 p {
+        font-size: 15px;
+    }
+    .col-sm-4.SubMember {
+        width: 100%;
+        float: left;
+    }
+}
+
+
+
+
+@media (max-width:480px){
+    .bs-slider > .carousel-inner > .item > img, .bs-slider > .carousel-inner > .item > a > img {
+        margin: auto;
+        max-width: 140%!important;
+        width: 140% !important;
+    }
+    .AboutSection .col-sm-6.left a {
+        left: 40%;
+        position: absolute;
+        top: 30%;
+    }
+
+    .ServicesSection .col-sm-3 {
+        float: left;
+        margin-bottom: 15px;
+        width: 100%;
+    }
+    footer .col-sm-3 {
+        border-left: medium none;
+        border-top: 1px solid #2c2d32;
+        float: left;
+        min-height: auto;
+        padding-bottom: 10px;
+        padding-top: 0;
+        width: 100%;
+    }
+    .AboutSection .right.carousel-control {
+        right: 34.6%;
+    }
+    .AboutSection .left.carousel-control {
+        left: 34.6%;
+    }
+    .nav-tabs > li > a {
+        width: 100%;
+        float: left;
+    }
+    .nav-tabs > li {
+        float: left;
+        margin-bottom: 0;
+        width: 49%;
+        margin: 2px;
+    }
+    .col-sm-12 .innerCare h2 {
+        font-size: 13px;
+        float: left;
+        width: 100%;
+        text-align: center;
+    }
+    .col-sm-12 .innerCare a {
+        float: none;
+        display: inline-block;
+        padding: 8px 15px;
+        font-size: 12px;
+        margin: 0 auto;
+        width: auto;
+    }
+
+    .col-sm-12 .innerCare .col-sm-4,.col-sm-12 .innerCare .col-sm-5 {
+        text-align: center;
+        float: left;
+        width: 100%;
+    }
+    .ContactSection .col-sm-12 .innerCare a {
+        float: none;
+        display: inline-block;
+    }
+}
+
+@media (max-width:435px){
+    .sectop a .fa {
+        font-size: 14px;
+        padding-right: 5px;
+    }
+    .sectop a {
+        font-size: 13px;
+        padding: 9px 11px;
+    }
+    .col-sm-6.left.PaddingNone a img {
+        margin-top: 10px;
+        width: 70%;
+    }
+    .copyright p {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .sectop .btn.btn-primary {
+        font-size: 13px;
+        padding: 9px 11px;
+    }
+    .AboutSection .col-sm-12.SmallSlider h2 {
+        font-size: 13px;
+    }
+    .SucessStory .col-md-3 {
+        float: left;
+        width: 100%;
+    }
+    .SucessStory .pagination ul li a {
+        padding: 5px 10px;
+        margin: 0 2px;
+    }
+}
+
+@media (max-width:414px){
+    .top ul li a {
+        padding: 0 5px;
+    }
+    .sectop a {
+        font-size: 12px;
+        padding: 9px 10px;
+    }
+}
+
+@media (max-width:384px){
+    .sectop a {
+        border: 1px solid;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 9px 10px;
+    }
+    .AboutSection .col-sm-6 .col-sm-4 {
+        float: left;
+        width: 100%;
+    }
+    .AboutSection .col-sm-12.SmallSlider h2 span {
+        width: 100%;
+    }
+    .SmallSlider {
+        height: 440px;
+    }
+    .SucessStory .pagination input {
+        width: 40%;
+    }
+    .SucessStory .pagination ul li a {
+        padding: 5px 5px;
+    }
+    .nav-tabs > li > a {
+        width: 100%;
+        float: left;
+        font-size: 11px;
+        padding: 10px;
+    }
+    .nav-tabs > li {
+        float: left;
+        margin-bottom: 0;
+        width: 48%;
+        margin: 2px;
+    }
+    .demo-gallery > ul > li {
+        width: 100%;
+    }
+    .sectop .dropdown {
+        float: left;
+        border-radius: 30px;
+        width: 100%;
+    }
+    .sectop .btn.btn-primary {
+        font-size: 13px;
+        padding: 11px 25px;
+        width: 75%;
+        margin-bottom: 10px;
+    }
+    .RightSection .sectop {
+        display: inline-block;
+        float: left;
+        text-align: center;
+        width: 100%;
+    }
+    .sectop a {
+        border: 2px solid;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 11px 10px;
+        display: inline-block;
+        float: none;
+        width: 75%;
+    }
+    .sectop .dropdown-menu {
+        width: 250px;
+        border: none;
+        border-radius: 4px;
+        top: 45px;
+        left: 65px;
+    }
+}
+
+@media (max-width:360px){
+    .sectop a {
+        margin: 0 2px;
+    }
+    .AboutSection .col-sm-6.left a {
+        left: 37%;
+        position: absolute;
+        top: 28%;
+    }
+    .HeadlineSection2 h2 {
+        font-size: 22px;
+    }
+    .sectop .dropdown-menu {
+        left: 50px;
+    }
+}
+
+@media (max-width:320px){
+    .pull-left.Logo img {
+        margin-bottom: 10px;
+        width: 60%;
+    }
+}

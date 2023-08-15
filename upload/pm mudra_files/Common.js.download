@@ -1,0 +1,935 @@
+﻿var AllUrls = [];
+var dependentproperty = new Array();
+var MyPermissions = new Array();
+var TranslationsList = new Array();
+
+$.ajaxSetup({
+    beforeSend: function () {
+        var url = this.url;
+        if (url != undefined && url.toLowerCase().indexOf("/addlabeltexts") == -1 && url.toLowerCase().indexOf("/captcha/") == -1 && url.toLowerCase().indexOf("/getnotifications/") == -1)
+            AllUrls.push(url);
+        ShowWait();
+    },
+    complete: function () {
+        var url = this.url;
+        AllUrls = $.grep(AllUrls, function (value) {
+            return value != url;
+        });
+        HideWait();
+    },
+    success: function () {
+        var url = this.url;
+        AllUrls = $.grep(AllUrls, function (value) {
+            return value != url;
+        });
+        HideWait();
+    },
+    error: function (jqXHR, exception) {
+        var url = this.url;
+        AllUrls = $.grep(AllUrls, function (value) {
+            return value != url;
+        });        
+        HideWait();        
+        if (url.toLowerCase().indexOf("/dashboard/") == -1) {
+            if (jqXHR.status === 0) {
+                alert('Not connect.\nVerify Network.');
+            } else if (jqXHR.status == 404) {
+                alert('Requested page not found. [404]');
+            } else if (jqXHR.status == 500) {
+                alert('Internal Server Error [500].');
+            } else if (exception === 'parsererror') {
+                alert('Requested JSON parse failed.');
+            } else if (exception === 'timeout') {
+                alert('Time out error.');
+            } else if (exception === 'abort') {
+                alert('Ajax request aborted.');            
+            } else {
+                alert('Uncaught Error.\n' + jqXHR.responseText);
+            }
+        }
+    },
+    async: true,
+    timeout: 120000,
+    cache: false
+});
+
+function loadGrid() {
+    var params = $('#form').serialize();
+    if (params.indexOf("%3C") >= 0 || params.indexOf("%3E") >= 0) {
+        alert('A potentially dangerous input detected. Try avoiding special characters like less than (<) , greater than (>)');
+    }
+    else
+    {
+        $("#manage").hide();
+        $("#main").hide();
+        $(window).scrollTop(0);
+        $('#grid').load($("#form").attr('action'), $('#form').serializeArray(), function (response, status, xhr) {
+            if (status == "error") {
+            }
+            else {
+                InitThickBox();
+                $("#main").fadeIn("slow");
+            }
+            $('title').html($('.title-admin:visible:first > lang > *:visible').text());
+        });
+    }
+}
+
+function SubmitConfirm(href, msg) {
+    var flag = confirm(msg);
+    if (flag == true) {
+        $.ajax({
+            url: href,
+            cache: false,
+            context: document.body,
+            success: function () {
+                loadGrid();
+            },
+            async: false
+        });
+    }
+    return false;
+}
+
+function reloadMe() {
+    ChangeCss(false);
+    tb_remove();
+    $("#TB_window").remove();
+    loadGrid();
+}
+
+function CallSort(cols, order) {
+
+    $('#order').val(order);
+    $('#cols').val(cols);
+    $('#pageNo').val(0);
+    loadGrid();
+}
+
+function OnChangeSelect() {
+    $('#pageNo').val('0');
+    loadGrid();
+}
+
+function activate(e, p) {
+    if (e.keyCode != 13) {
+        return true;
+    }
+    else // ie. enter was pressed
+    {
+        if (p == 'p') {
+            var pageNo = $('#pageNo').val();
+            if (isNaN(pageNo)) {
+                $('#pageNo').val(currPageNo);
+            }
+            else if (parseInt(pageNo) > maxPageNo || parseInt(pageNo) == 0) {
+                $('#pageNo').val(currPageNo);
+            }
+            else {
+                loadGrid();
+            }
+        }
+        else {
+            $('#order').val('');
+            $('#cols').val('');
+            $('#pageNo').val(0);
+            loadGrid();
+        }
+        return false;
+    }
+}
+
+function ChangePage(i) {
+    $('#pageNo').val(i);
+    loadGrid();
+    $('#msg').focus();
+}
+
+function CheckSearch() {
+    $('#order').val('');
+    $('#cols').val('');
+    loadGrid();
+}
+
+function isBackSpace(e, id) {
+    var charCode;
+    e = e || event;
+    if (!e) { return true; }
+    var code = e.keyCode || e.which || null;
+    if (code) {
+        if (code == 9)
+        { return true; }
+        else if (code == 8 || code == 46) {
+            $('#' + id).val('');
+        }
+    }
+    return false;
+}
+
+function InitThickBox() {
+    $('.thickbox').unbind('click');
+    tb_init('a.thickbox, area.thickbox, input.thickbox, button.thickbox');
+}
+
+function CheckDecimal(tmp) {
+    if (!isNaN(tmp.value) && parseFloat(tmp.value)) {
+        tmp.value = parseFloat(tmp.value);
+        return true;
+    }
+    else {
+        tmp.value = '';
+        return false;
+    }
+}
+
+function CheckInteger(tmp) {
+    if (!isNaN(tmp.value) && parseInt(tmp.value)) {
+        tmp.value = parseInt(tmp.value);
+        return true;
+    }
+    else {
+        tmp.value = '';
+        return false;
+    }
+}
+
+function CheckFile(id, extn, size) {
+    var control = $("#" + id);
+    var fileUpload = control.val();
+    var extension = '.' + fileUpload.substr(fileUpload.lastIndexOf('.') + 1).toLowerCase();
+
+    if (fileUpload.length > 0) {
+        if ($.inArray(extension, extn.split(',')) == -1) {
+            $("span[data-valmsg-for='" + id + "']").html('<span for="' + id + '" generated="true" class="">Only' + extn.replace(/\./g, " *.") + ' files are allowed.</span>').addClass("field-validation-error").removeClass("field-validation-valid");
+            control.replaceWith(control.val('').clone(true));
+            control = $("#" + id)
+            control.focus();
+        }
+        else {
+            try {
+                if (control[0].files[0].size > size) {
+                    $("span[data-valmsg-for='" + id + "']").html('<span for="' + id + '" generated="true" class="">The file size should not exceed ' + (size / (1024 * 1024)).toFixed(2) + ' MB.</span>').addClass("field-validation-error").removeClass("field-validation-valid");
+                    control.replaceWith(control.val('').clone(true));
+                    control = $("#" + id)
+                    control.focus();
+                }
+            }
+            catch (ex) {
+            }
+        }
+    }
+}
+
+function FillChildDropDown(ChildId, FunctionName, Params) {
+    var formdata = {};
+    var SelectedParentId = '';
+    $(Params.split(',')).each(function (index, value) {
+        if (index == 0) {
+            formdata["id"] = $('#' + value).val();
+            SelectedParentId = $('#' + value).val();
+        }
+        else {
+            formdata[value] = $('#' + value).val();
+        }
+    });
+    var ChildControl = $('#' + ChildId);
+    ChildControl.empty();
+    if(!ChildControl.prop("multiple"))
+    {
+        ChildControl.append($('<option/>', {
+            value: '',
+            text: 'Select ' + $('label[for=' + ChildId + ']').text()
+        }));
+    }
+    if (SelectedParentId != null && SelectedParentId != '') {
+        $.getJSON(ServerPath + 'Default/' + FunctionName + '/', formdata, function (data) {
+            $.each(data, function (index, item) {
+                ChildControl.append($('<option/>', {
+                    value: item.Value,
+                    text: item.Text
+                }));
+            });
+            ChildControl.val('').trigger("change").trigger("chosen:updated");
+        });
+    }
+    else {
+        ChildControl.val('').trigger("change").trigger("chosen:updated");
+    }
+}
+
+function AddStar(id) {
+    if ($('#' + id).attr('type') != 'checkbox' && ($('#' + id).attr('type') != 'hidden' || $('#' + id).hasClass('uploadfile') || $('#' + id).hasClass('lang') || $('#' + id).is('select') || ($('#' + id).attr('type') == 'hidden' && $('#' + id + '1').is('select[multiple]')))) {
+        var req = $('#' + id).attr('data-val-required');
+        if (undefined != req) {
+            AddAsterick(id);
+        }
+    }
+}
+
+function RemoveStar(id) {
+    if ($('#' + id).attr('type') != 'checkbox' && ($('#' + id).attr('type') != 'hidden' || $('#' + id).hasClass('uploadfile') || $('#' + id).is('select') || ($('#' + id).attr('type') == 'hidden' && $('#' + id + '1').is('select[multiple]')))) {
+        var req = $('#' + id).attr('data-val-required');
+        if (undefined != req) {
+            RemoveAsterick(id);
+        }
+    }
+}
+
+function AddAsterick(id) {
+    if ($('#' + id).attr('type') != 'checkbox') {
+        var label = $('#' + id).closest("td").find('label[for="' + id + '"]'); //$(form).find('label[for="' + id + '"]');    
+        var text = label.text();
+        if (text.length > 0) {
+            $(label).children('span[class^="asterisk"]').remove();
+            label.append(' <span class="asterisk">*</span>');
+        }
+        else {
+            $('#' + id).addClass('required');
+        }
+    }
+}
+
+function RemoveAsterick(id) {
+    if ($('#' + id).attr('type') != 'checkbox') {
+        var label = $('#' + id).closest("td").find('label[for="' + id + '"]'); //$(form).find('label[for="' + id + '"]');
+        var text = label.text();
+        if (text.length > 0) {
+            $(label).children('span[class^="asterisk"]').remove();
+        }
+        else {
+            $('#' + id).removeClass('required');
+        }
+    }
+}
+function GetExactFileName(id) {
+    return id.split(/_(.+)?/)[1];
+}
+function ViewFile(id) {
+    var flag = false;
+    $(id).attr('href', '#');
+    var t = $(id).parent().parent().find('.uploadfile');
+    if (t) {
+        document.getElementById(t.attr('id')).type = "hidden";
+        $.ajax({
+            url: ServerPath + 'Default/CheckFileExists/',
+            async: false,
+            data: { id: t.val(), path: t.attr("path") },
+            success: function (data) {
+                if (data.Status) {
+                    $(id).attr('href', ServerPath + 'Default/ViewFile/?id=' + encodeURIComponent(t.val()) + '&path=' + encodeURIComponent(t.attr("path")));
+                    flag = true;
+                    //$(id).attr('href', 'javascript:void(0);');
+                }
+                else {
+                    alert(data.Message);
+                    flag = false;
+                }
+            }
+        });
+    }
+    return flag;
+}
+function UploadFile(id) {
+    if (!$('#' + id).is(':disabled')) {
+        //document.getElementById(id).type = "file";
+        //$('#' + id).trigger('click');
+        $('#_uploadfile_').val('');
+        $('#_uploadfile_').attr("filetype", $('#' + id).attr("filetype"));
+        $('#_uploadfile_').attr("targetfield", id);
+        $('#_uploadfile_').trigger('click');
+    }
+}
+function RemoveFile(id) {
+    var t = $(id).parent().parent().find('.uploadfile');
+    $(t).parent().find('a:contains("Upload")').show();
+    if (t) {
+        t.val('').trigger('change');
+        $(id).parent().html('<br /><span style="color:red;">File Removed.</span>');
+    }
+}
+function ResetFile(id) {
+    $(id).parent().replaceWith($(id));
+    $(id).wrap('<div class="Display-For"></div>');
+    $(id).before('<a href="javascript:void(0);" onclick="UploadFile(\'' + $(id).attr("id") + '\');">Upload</a>');
+    var path = $(id).attr("path");
+    if ($(id).val() != "") {
+        $(id).after('<span class="upl_response"><a href="javascript:void(0);" target="_blank" onclick="javascript:return ViewFile(this);">View [' + GetExactFileName($(id).val()) + ']</a>&nbsp;<a href="javascript:void(0);" onclick="RemoveFile(this);">Remove</a></span>');
+        $(id).parent().find('a:contains("Upload")').hide();
+    }
+}
+
+function ConvertEnToMr(v, Labels) {
+    var ENText = $.trim($(v).text());
+    var MRText = ENText;
+    var result = $.grep(TranslationsList, function (e) { return e.ENText == ENText; });
+    if (result.length > 0) {
+        MRText = (result[0].MRText != null && result[0].MRText != "") ? $.trim(result[0].MRText) : ENText;
+    }
+    else if ($.isNumeric(ENText)) {
+        MRText = NumbersToMr(ENText);
+    }
+    else {
+        Labels.push(ENText);
+    }
+    $(v).html('<en>' + ENText + '</en><mr>' + MRText + '</mr>')
+}
+
+function NumbersToMr(input) {
+    var zero = 48, // char code for Arabic zero
+    nine = 57, // char code for Arabic nine
+    offset = 2406 - zero,
+    output = input.toString().split(""),
+    i, l = output.length, cc;
+
+    for (i = 0; i < l; i++) {
+        cc = output[i].charCodeAt(0);
+        if (cc >= zero && cc <= nine) {
+            output[i] = String.fromCharCode(cc + offset);
+        }
+    }
+    return output.join("");
+}
+
+function AddRequiredAsterisk() {
+    $("form").removeData("validator");
+    $("form").removeData("unobtrusiveValidation");
+    $.validator.unobtrusive.parse("form");
+    $('form').attr('autocomplete', 'off');
+    //$('label').each(function (i, v) {
+    //    //$(v).nextUntil().wrapAll('<div class="Display-Error"></div>');
+        
+    //});
+    
+   
+    $('input[data-val-required], textarea[data-val-required], select[data-val-required]').each(function () {
+        AddStar($(this).attr('id'));
+    });
+    $('select[multiple]').change(function () {
+        id = this.id.replace('1', '');
+        var seq_Ids = $('#' + id).val().split(',')
+        var Ids1 = $(this).val();
+        var NewItems = $(Ids1).not(seq_Ids).get();
+        var OldItems = $(seq_Ids).not(Ids1).get();
+        if (NewItems.length > 0) {
+            $.merge(seq_Ids, NewItems);
+        }
+        else if (OldItems.length > 0) {
+            seq_Ids = seq_Ids.filter(function (el) {
+                return OldItems.indexOf(el) < 0;
+            });
+        }
+        seq_Ids = seq_Ids.filter(function (v) { return v !== '' });
+        $('#' + id).val(seq_Ids.join(","));
+    });
+
+    AddRequiredIfValidations();
+   
+    InitThickBox();
+
+    $.validator.unobtrusive.adapters.add(
+    'isdateafter', ['dependentproperty', 'allowequaldates'], function (options) {
+        options.rules['isdateafter'] = options.params;
+        options.messages['isdateafter'] = options.message;
+    });
+
+    $.validator.addMethod("isdateafter", function (value, element, params) {
+        var startdatevalue = $('input[id="' + params.dependentproperty + '"]').val();
+        if (!value || !startdatevalue) return true;
+        return (params.allowequaldates == 'True') ? ConvertDate(startdatevalue) <= ConvertDate(value) : ConvertDate(startdatevalue) < ConvertDate(value);
+    }, '');
+
+    $.validator.unobtrusive.adapters.add(
+    'islessthan', ['dependentproperty', 'allowequalvalues'], function (options) {
+        options.rules['islessthan'] = options.params;
+        options.messages['islessthan'] = options.message;
+    });
+
+    $.validator.addMethod("islessthan", function (value, element, params) {
+        var startvalue = $('input[id="' + params.dependentproperty + '"]').val();
+        if (!value || !startvalue) return true;
+        return (params.allowequalvalues == 'True') ? parseFloat(startvalue) >= parseFloat(value) : parseFloat(startvalue) > parseFloat(value);
+    }, '');
+
+    $(".uploadfile").each(function () {
+        if ($('#_uploadfile_').length == 0) {
+            $("body").append('<input type="file" name="_uploadfile_" id="_uploadfile_" style="display:none" />');
+        }
+        if (this.id == "") {
+            this.id = $(this).attr("name").replace(/\[/g, "_").replace(/\]./g, "_");
+        }
+        $(this).wrap('<div class="Display-For"></div>');
+        $(this).before('<a href="javascript:void(0);" onclick="UploadFile(\'' + this.id + '\');">Upload</a>');
+        if ($(this).val() != "") {
+            $(this).after('<span class="upl_response"><a href="javascript:void(0);" target="_blank" onclick="javascript:return ViewFile(this);">View [' + GetExactFileName($(this).val()) + ']</a>&nbsp;<a href="javascript:void(0);" onclick="RemoveFile(this);">Remove</a></span>');
+            $(this).parent().find('a:contains("Upload")').hide();
+        }
+    });
+    $("#_uploadfile_").unbind('change');
+    $("#_uploadfile_").change(function () {
+        var id = this;
+        var targetfield = '#' + $('#_uploadfile_').attr("targetfield");
+        if (id.files != null) {
+            var formdata = new FormData();
+            if ($(targetfield).next('.upl_response').length == 0) {
+                $(targetfield).after('<span class="upl_response"></span>');
+            }
+            var upl_response = $(targetfield).next('.upl_response');
+            var AllowedFileId = $(id).attr("filetype");
+            for (var i = 0; i < 1; i++) {
+                var file = id.files[i];
+                var filetype = file.type;
+                var filelength = file.size;
+                var extension = file.name.substr(file.name.lastIndexOf('.') + 1).toLowerCase();
+                var result = $.grep(AllowedFiles, function (e) { return e.AllowedFileId == AllowedFileId; })[0];
+                if (filelength > result.Size * 1024 * 1024) {
+                    $(upl_response).html('<br /><span style="color:red;">The file size should not exceed than ' + result.Size + ' MB.</span>');
+                    $(targetfield).val('').trigger('change');
+                }
+                else if ($.inArray(extension, result.Extensions.toLowerCase().split(',')) == -1) {
+                    $(upl_response).html('<br /><span style="color:red;">Only ' + result.Extensions.toLowerCase().replace(/,/g, ', ') + ' files are allowed.</span>')
+                    $(targetfield).val('').trigger('change');
+                }
+                //                else if ($.inArray(file.type, result.MIMEType.split(',')) == -1) {
+                //                    $(upl_response).html('<br /><span style="color:red;">Selected file might be of invalid type or corrupted.</span>');
+
+                //                    $(targetfield).val('').trigger('change');
+                //                    //alert('Only ' + result.Extensions.replace(/,/g, ', ') + ' files are allowed.');
+                //                }
+                else {
+                    if (formdata) {
+                        formdata.append("AllowedFileId", AllowedFileId);
+                        formdata.append(id.id, file);
+                        $(upl_response).html('<img src="' + ServerPath + 'Images/uploading.gif" style="vertical-align: top; border: 1px solid #CCC;"/> Uploading...');
+                        $.ajax({
+                            beforeSend: function () {
+                                $(targetfield).closest('form').find('input[type=submit]').attr('disabled', 'disabled');
+                            },
+                            complete: function () {
+                                $(targetfield).closest('form').find('input[type=submit]').removeAttr('disabled');
+                            },
+                            url: ServerPath + 'Default/UploadFile/',
+                            type: "POST",
+                            data: formdata,
+                            processData: false,
+                            contentType: false,
+                            async: false,
+                            success: function (data) {
+                                if (data.Status) {
+                                    $(upl_response).html('<a href="javascript:void(0);" target="_blank" onclick="javascript:return ViewFile(this);">View [' + GetExactFileName(data.Data) + ']</a>&nbsp;<a href="javascript:void(0);" onclick="RemoveFile(this);">Remove</a><br /><span style="color:green;">' + data.Message + '</span>');
+                                    $(targetfield).val(data.Data).trigger('change');
+                                    $(targetfield).parent().find('a:contains("Upload")').hide();
+                                }
+                                else {
+                                    $(upl_response).html('<br /><span style="color:red;">' + data.Message + '</span>');
+                                    $(targetfield).val('').trigger('change');
+                                    $(targetfield).parent().find('a:contains("Upload")').show();
+                                }
+                            },
+                            error: function (jqXHR, exception) {
+                                var errMsg = "";
+                                if (jqXHR.status === 0) {
+                                    errMsg = 'Not connect.\nVerify Network.';
+                                } else if (jqXHR.status == 404) {
+                                    errMsg = 'Requested page not found. [404]';
+                                } else if (jqXHR.status == 500) {
+                                    errMsg = 'Internal Server Error [500].';
+                                } else if (exception === 'parsererror') {
+                                    errMsg = 'Requested JSON parse failed.';
+                                } else if (exception === 'timeout') {
+                                    errMsg = 'Time out error.';
+                                } else if (exception === 'abort') {
+                                    errMsg = 'Ajax request aborted.';
+                                } else {
+                                    errMsg = 'Uncaught Error.\n' + jqXHR.responseText;
+                                }
+                                //console.log(jqXHR);
+                                $(upl_response).html('<br /><span style="color:red;">' + errMsg + '</span>');
+                                $(targetfield).val('').trigger('change');
+                                $(targetfield).parent().find('a:contains("Upload")').show();
+                                $(targetfield).closest('form').find('input[type=submit]').removeAttr('disabled');
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    });
+
+    $('select[id]').each(function () {
+        $(this).chosen({ disable_search_threshold: 5, width: ($(this).width() + 18) + "px", search_contains: true });
+        $(this).change(function () {
+            var form = $('#' + this.id).closest("form");
+            $(form).validate().element('#' + this.id);
+        });
+    }); 
+       
+    LoadMenu();  //uncommit by deepak 26-12-2016
+    
+}
+
+
+
+
+
+$(function () {
+    AddRequiredAsterisk();
+    if ($('#manage').length == 0) {
+
+    }
+//    if ($.browser.mozilla == undefined) {
+//        alert('For better website performance switch to "Mozilla Firefox"');
+//    }
+});
+
+
+function ReloadImage() {
+    var src = $('.captcha_img').attr('src').split('?')[0] + '?' + Math.random();
+    $('.captcha_img').attr('src', src);
+}
+
+function LoadInDiv(href) {
+    //$(window).scrollTop(0);
+    $("#manage, #main").hide();
+    $("#manage").load(href, function (response, status, xhr) {
+        if (status == "error") {
+            $("#main").fadeIn("slow");
+            $("#manage").fadeOut("slow");
+        }
+        else {
+            $(window).scrollTop(0);
+            $("#manage").fadeIn("slow");
+            $("#main").fadeOut("slow");
+            //InitThickBox();
+            $("#main .success-icon, #main .error-icon").remove();
+        }
+        $('title').html($('.title-admin:visible:first > lang > *:visible').text());
+    });
+    return false;
+}
+
+function GoBack() {
+    $(document).unbind('keydown');
+   // ChangeCss(false);
+    $("#main").fadeIn("slow");
+    $("#manage").fadeOut("slow");
+    $("#manage").html('');
+    $(".success-icon, .error-icon").remove();
+}
+
+function SubmitJForm(id, divid) {  
+    
+    //divid = divid || "manage";
+    //if ($(id).valid() == true) {
+    //    $('#' + divid).hide();
+    //    var disablediDs = new Array();
+    //    $('[data-val-requiredif-dependentproperty]:disabled').each(function () {
+    //        disablediDs.push(this.id);
+    //    });
+    //    $('[data-val-requiredif-dependentproperty]:disabled').removeAttr('disabled');
+    //    $.ajax({ // create an AJAX call...
+    //        data: $(id).serialize(), // get the form data
+    //        type: $(id).attr('method'), // GET or POST
+    //        url: $(id).attr('action'), // the file to call
+    //        success: function (response) { // on success..
+    //            $(".success-icon, .error-icon").remove();
+    //            $('#' + divid).html(response).fadeIn("slow");
+    //        },
+    //        async: false,
+    //        error: function (jqXHR, exception) {                
+    //            if (disablediDs.length > 1) {
+    //                $('#' + disablediDs.join(', #')).attr('disabled', 'disabled');
+    //            }
+    //            $('#' + divid).show();
+    //            if (jqXHR.status === 0) {
+    //                alert('Not connect.\nVerify Network.');
+    //            } else if (jqXHR.status == 404) {
+    //                alert('Requested page not found. [404]');
+    //            } else if (jqXHR.status == 500) {
+    //                alert('Internal Server Error [500].');
+    //            } else if (exception === 'parsererror') {
+    //                alert('Requested JSON parse failed.');
+    //            } else if (exception === 'timeout') {
+    //                alert('Time out error.');
+    //            } else if (exception === 'abort') {
+    //                alert('Ajax request aborted.');
+    //            } else {
+    //                alert('Uncaught Error.\n' + jqXHR.responseText);
+    //            }
+    //        }
+    //    });
+        
+//    }
+//    else {
+//        var validator = $(id).validate();
+//        var errors = validator.numberOfInvalids();
+//        if (errors) {
+//            var elementid = $('#' + validator.errorList[0].element.id);
+//            $(document).scrollTop(0);
+//            if (elementid.hasClass('uploadfile')) {
+//                elementid.prev('a').focus();
+//            }
+//            else if ($('#' + elementid.id + '1').is('select[multiple]')) {
+//            $('#' + elementid.id + '1').focus().trigger('chosen:activate');
+//            }
+//            else { 
+//                elementid.focus().trigger('chosen:activate')
+//            }
+//        }
+////        var errors = validator.numberOfInvalids();
+////        if (errors) {
+////            var message = errors == 1
+////          ? 'Please correct the following error:\n'
+////          : 'Please correct the following ' + errors + ' errors.\n';
+////            var errors = "";
+////            if (validator.errorList.length > 0) {
+////                for (x = 0; x < validator.errorList.length; x++) {
+////                    errors += "\n\u25CF " + validator.errorList[x].message;
+////                }
+////            }
+////            alert(message + errors);
+////        }
+//    }
+//    return false;
+}
+
+function HideWait() {
+    if (AllUrls.length == 0) {
+        $('#lightbox1, #overlay').hide();
+        $('title').html($('.title-admin:visible:first > lang > *:visible').text());
+    }
+    return true;
+}
+
+function ShowWait() {
+    if (AllUrls.length != 0  ) {        
+        
+            $('#lightbox1, #overlay').show(); 
+       
+    }
+    return true;
+}
+
+function LoadMenu() {
+
+//        $('.SettingMenu .dropBoxMain').click(function (event) {
+//            if ($(this).parent().children('.dropBox').is(":visible")) {
+//                $('.SettingMenu .dropBox').hide();
+//            }
+//            else {
+//                $('.SettingMenu .dropBox').hide();
+//                $(this).parent().children('.dropBox').show();
+//                event.stopPropagation();
+//            }
+//        });
+
+
+    $('.table-action tbody tr, .SettingMenu').unbind('click');
+   // $(document).unbind('click');
+
+    $(document).click(function (e) {
+        var $clicked = $(e.target);
+        if ($clicked.parents('.dropBox').length == 0) {
+            $(".dropBox").fadeOut("slow");
+            $('.dropme').removeClass('active');
+        }
+    });
+
+    $('.table-action tbody tr, .SettingMenu').click(function (event) {
+        //alert($(this).children('td .dropBox').html());
+        if ($(this).find('.dropBox').is(":visible")) {
+            $('.SettingMenu .dropBox').fadeOut("slow");
+            $('.dropme').removeClass('active');
+        }
+        else {
+            $('.SettingMenu .dropBox').fadeOut("slow");
+            $(this).find('.dropBox').fadeIn("slow");
+            event.stopPropagation();
+        }
+    });
+}
+
+function imgError(img) {
+    setTimeout(function () { }, 1000);
+    img.src = img.src.split('?')[0] + '?' + Math.random();
+};
+
+function AddRequiredIfValidations() {
+    dependentproperty = new Array();
+    $('[data-val-requiredif-dependentproperty]').each(function () {
+        var fieldname = $('#' + this.id).attr('data-val-requiredif-dependentproperty');
+        var targetname = $('#' + this.id).attr('name');
+        targetname = targetname.substr(0, targetname.lastIndexOf('.')).replace(/\[/g, '_').replace(/\]/g, '_');
+        if (targetname != "") {
+            targetname = targetname + '_';
+            if (!fieldname.match("^" + targetname)) {
+                fieldname = targetname + fieldname;
+                $('#' + this.id).attr('data-val-requiredif-dependentproperty', fieldname);
+            }
+        }
+        dependentproperty.push(fieldname);
+    });
+    dependentproperty = $.unique(dependentproperty);
+    $(dependentproperty).each(function (index1, value1) {
+        $('#' + value1).each(function (value2, index2) {
+            CheckRequiredIf(value1, false);
+        });
+
+        $('#' + value1).change(function (index2) {
+            CheckRequiredIf(value1, true);
+        });
+    });
+}
+
+function CheckRequiredIf(value1, reset) {
+    var control = $('#' + value1);
+    var controltype = control.attr('type');
+    var actualvalue =
+                controltype === 'checkbox' ?
+                control.is(":checked") :
+                control.val();
+    $.unique($('[data-val-requiredif-dependentproperty=' + value1 + ']')).each(function (index3, value3) {
+        var targetvalue = $('#' + value3.id).attr('data-val-requiredif-targetvalue');        
+        var onlyIf = $('#' + value3.id).attr('data-val-requiredif-onlyif');
+        var noteqaul = $('#' + value3.id).attr('data-val-requiredif-noteqaul');
+        var mandatory = $('#' + value3.id).attr('data-val-requiredif-mandatory');
+        var errMsg = $('#' + value3.id).attr('data-val-requiredif');        
+        var extra_id = (($('#' + value3.id).attr('type') == 'hidden' && $('#' + value3.id + '1').is('select[multiple]')) ? ',#' + value3.id + '1' : '');
+        if ((noteqaul == 'false' && $.inArray(actualvalue.toString(), targetvalue.split(',')) != -1) || (noteqaul == 'true' && $.inArray(actualvalue.toString(), targetvalue.split(',')) == -1)) {
+            try {
+                if (mandatory == 'true') {
+                    $('#' + value3.id).rules("add", {
+                        required: true,
+                        messages: {
+                            required: errMsg
+                        }
+                    });
+                    AddAsterick(value3.id);
+                }
+                else {
+                    $('#' + value3.id).rules("remove", "required");
+                    RemoveAsterick(value3.id);
+                }
+                $('#' + value3.id + extra_id).removeAttr('disabled').trigger("chosen:updated");
+            }
+            catch (e) {
+                if (mandatory == 'true') {
+                    try {
+                        $('#' + value3.id).attr('data-val-required', errMsg);
+                        AddAsterick(value3.id);
+                    }
+                    catch (e2) {
+                    }
+                }
+                else {
+                    try {
+                        $('#' + value3.id).rules("remove", "required");
+                        RemoveAsterick(value3.id);
+                    }
+                    catch (e2) {
+                        $('#' + value3.id).removeAttr('data-val-required');
+                        RemoveAsterick(value3.id);
+                    }
+                }
+                $('#' + value3.id + extra_id).removeAttr('disabled').trigger("chosen:updated");
+            }
+        }
+        else {
+            try {
+                $('#' + value3.id).rules("remove", "required");
+                RemoveAsterick(value3.id);
+                if (onlyIf == 'true') {
+                    $('#' + value3.id + extra_id).val('').attr('checked', false).attr('disabled', 'disabled').trigger("chosen:updated");
+                }
+                var form = $('#' + value3.id).closest("form");
+                $(form).validate().element('#' + value3.id);
+            }
+            catch (e) {
+                $('#' + value3.id).removeAttr('data-val-required');
+                RemoveAsterick(value3.id);
+                if (onlyIf == 'true') {
+                    $('#' + value3.id + extra_id).val('').attr('checked', false).attr('disabled', 'disabled').trigger("chosen:updated");
+                }
+            }
+        }
+        if (reset)
+            $('#' + value3.id + extra_id).trigger('change');
+    });
+}
+
+function IterateObj(obj, objname, depth) {
+    var space = "";
+    for (i = 0; i < depth; i++) {
+        space += "\t";
+    }
+    var str = space + objname + "()\n" + space + "{\n";
+    space += "\t";
+    $.each(obj, function (i, n) {
+        if (n == "[object Object]") {
+            str += IterateObj(n, i, depth + 1);
+        }
+        else {
+            str += space + i + " : " + n + "\n";
+        }
+    });
+    return str + space.slice(0, -1) + "}\n";
+}
+
+
+
+function PrintFrame(href) {
+    tb_show("", href + (href.indexOf("?") >= 0 ? '&' : '?') + 'keepThis=True&TB_iframe=True&print=true&width=900');
+    return false;
+//    var iFrame = $('#PrintForm');
+//    $(iFrame).unbind('load');
+//    if (iFrame.length) {
+//        iFrame.attr('src', href);
+//        iFrame.load(function () {
+//            var tempFrame = $('#PrintForm')[0];
+//            var tempFrameWindow = tempFrame.contentWindow ? tempFrame.contentWindow : tempFrame.contentDocument.defaultView;
+//            tempFrameWindow.focus();
+//            tempFrameWindow.print();
+//        });
+//    }
+//    return false;
+}
+
+
+
+function ClearField(id) {
+    $('#' + id).val('');
+    $('#' + id).next('div').html('');
+}
+
+
+
+function ConvertDate(val) {
+    if (val == "") 
+        return;
+    return new Date(val.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$2/$1/$3"));
+}
+
+function DMYtoMYD(val) {
+    if (val == "")
+        return;
+    return val.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$2/$1/$3");
+}
+
+function ExportReport(val) {
+    if (val != "") {
+        var data = {};
+        $.each($('#form').serializeArray(), function (field) {
+            if ($('#_' + this.name).hasClass('hasDatepicker')) {
+                data[this.name] = DMYtoMYD(this.value);
+            }
+            else {
+                data[this.name] = this.value;
+            }
+        });
+        $('#PrintForm').attr("src", $("#form").attr('action') + "?RequestType=" + val + "&" + $.param(data));
+    }
+}
+
+function addCssRule(rule, css) {
+    css = JSON.stringify(css).replace(/"/g, "").replace(/,/g, ";");
+    $("<style>").prop("type", "text/css").html(rule + css).appendTo("head");
+}
