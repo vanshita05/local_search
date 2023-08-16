@@ -19,10 +19,10 @@
 
 8.After creating database name click on import.
 
-9.Browse the file in directory(Website\database\website.sql)
+9.Browse the file in directory(local_search\common\local_search_db.sql)
 
 10.After importing successfully.
 
-11.Open any browser and type http://localhost/Website.
+11.Open any browser and type http://localhost/local_search.
 
 12.First register and then login.
